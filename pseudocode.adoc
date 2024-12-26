@@ -1,0 +1,88 @@
+----
+This project is amined for product releases that should happen on 25th of every month.
+
+Git Workflow Architecture is used as development process for this project.
+
+ Branches:
+	permanent branches:
+		master : Branch stores the official release history.
+		develop : Branch serves as an integration branch for features.
+		
+	temparory branches:
+		feature : Each new feature should reside in its own branch.
+		          Feature branches use develop as their parent branch.
+				  Feature branches should created off from the latest develop branch.
+				  Once the feature is implemented, merge feature branch to develop branch and delete feature branch.
+		release : Once develop branch has acquired enough features for a release 
+		          (or a predetermined release date is approaching), release branch frok off from develop branch.
+				  No new features can be added after this point, only bug fixes, documentation generation, and 
+				  other release-oriented tasks should go in this branch.
+				  Once it's ready to ship, the release branch gets merged into master and tagged with a version number.
+				  Incase of any additional commits on release branch, it should be merged back into develop.
+				  Once release done, delete release branch
+		hotfix : branches are used to quickly patch production releases. 
+		         Hotfix branches are a lot like release branches and feature branches except they're based on master instead of develop. 
+				 This is the only branch that should fork directly off of master. 
+				 As soon as the fix is complete, it should be merged into both master and develop (or the current release branch), 
+				 and master should be tagged with an updated version number.
+				  
+Example git workflow from start to end of a release:
+	step 1: check and confirm develop branch is fork with latest updated on master branch
+	Step 2: Clone the project repository to the local
+			Example: use below command to clone the branch develop to the local
+	        git clone -b develop <repository-url>
+
+	step 3: create feature branches from the develop branch.
+	        this example considered only one feature for this release.
+			Example: use below command to create a feature branch:
+				git checkout develop
+				git checkout -b feature_branch
+	
+	step 4: Once the feature is implemented on the feature branch, merge the feature branch to develop branch and delete the feature branch
+	        Example: command below
+				git checkout develop
+				git merge feature_branch
+				git branch -d feature_branch
+	
+	step 5: Once the develop branch is ready for release, create release branch from the develope branch
+			Example: command below
+				git checkout develop
+				git checkout -b release_branch
+				
+	step 6: Once release branch is ready to ship, the release branch gets merged into master and tagged with a version number.
+			Example: command below
+				git checkout master
+				git merge release_branch
+				git tag -a v0.1 -m “sdk version 0.1"
+				
+	step 7: Incase of any additional commits on release branch (such as bug fixes, documentation generation, other release-oriented tasks), 
+	        it should be merged back into develop
+			Example: command below
+				git checkout develop
+				git merge release_branch
+				
+	Step 8: delete the release branch, once the release complete
+			Example: command below
+				git branch -d release_branch
+				
+	Step 9: Incase of any quickly patch production releases:
+			create hotfix branch and use for the quick fix
+				Example: command below
+					git checkout master
+					git checkout -b hotfix_branch
+			perform the fix and commit the changes
+				Example: command below
+					git add .
+					git commit -m “added urgent.txt file on hotfix branch”
+
+			Once fix is complete and committed, it should be merged into both master and develop branch, and master should be tagged with an updated version number.
+				Example: command below
+					git checkout master
+					git merge hotfix_branch
+					git tag -a v0.2 -m “sdk version 0.2"
+					git checkout develop
+					git merge master
+
+	Repeate the step 1 to step 9 for each releases.
+	        
+----
